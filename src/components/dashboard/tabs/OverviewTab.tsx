@@ -126,12 +126,12 @@ export function OverviewTab() {
       </ChartCard>
 
       {/* Insight Callout */}
-      <InsightCallout title="Key Changes vs Previous Period">
+      <InsightCallout title="Period Highlights">
         <ul className="space-y-1.5 list-disc list-inside">
-          <li>Traffic increased 13.4% driven by 2 viral posts in r/technology</li>
-          <li>Conversion rate improved from 2.8% to 3.0% (+7.1%)</li>
-          <li>Karma velocity accelerated 20% week-over-week</li>
-          <li>Brand mentions spiked on Feb 2-3 (investigate sentiment)</li>
+          <li>Reddit-driven traffic up 13.4%, led by 2 high-performing posts in r/technology</li>
+          <li>Conversion rate improved from 2.8% → 3.0% (+7.1%)</li>
+          <li>Community growth accelerating — karma velocity +20% WoW</li>
+          <li>Brand mention spike on Feb 2–3 flagged for review</li>
         </ul>
       </InsightCallout>
     </div>
