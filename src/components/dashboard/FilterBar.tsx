@@ -110,8 +110,8 @@ export function FilterBar({
       </div>
 
       <div className="ml-auto">
-        <span className="text-xs text-muted-foreground italic">
-          📊 Mock data – connect APIs for live metrics
+        <span className="text-xs text-muted-foreground">
+          Last updated: Feb 12, 2026 · 9:00 AM
         </span>
       </div>
     </div>

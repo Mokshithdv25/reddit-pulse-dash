@@ -23,7 +23,7 @@ export function DashboardHeader({ activeTab, onTabChange }: DashboardHeaderProps
           <div>
             <h1 className="text-xl text-white flex items-center gap-3">
               <span className="font-black tracking-tight">RECHO</span>
-              <span className="font-bold">Reddit Performance Dashboard</span>
+              <span className="font-light opacity-90">Reddit Performance Report</span>
             </h1>
           </div>
         </div>
