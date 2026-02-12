@@ -21,12 +21,10 @@ export function DashboardHeader({ activeTab, onTabChange }: DashboardHeaderProps
       <div className="px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-semibold text-foreground">
-              Reddit Performance Console
+            <h1 className="text-xl text-foreground flex items-center gap-3">
+              <span className="font-black tracking-tight">RECHO</span>
+              <span className="font-bold">Reddit Performance Dashboard</span>
             </h1>
-            <p className="text-sm text-muted-foreground mt-0.5">
-              Unified analytics for organic, paid, and brand performance
-            </p>
           </div>
         </div>
       </div>
