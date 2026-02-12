@@ -17,11 +17,11 @@ const tabs: { id: TabType; label: string }[] = [
 
 export function DashboardHeader({ activeTab, onTabChange }: DashboardHeaderProps) {
   return (
-    <header className="bg-card border-b border-border">
-      <div className="px-6 py-4">
+    <header className="border-b border-border">
+      <div className="px-6 py-4 bg-[hsl(0,72%,47%)]">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl text-foreground flex items-center gap-3">
+            <h1 className="text-xl text-white flex items-center gap-3">
               <span className="font-black tracking-tight">RECHO</span>
               <span className="font-bold">Reddit Performance Dashboard</span>
             </h1>
