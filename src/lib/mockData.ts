@@ -65,16 +65,30 @@ export interface CampaignData {
 
 export interface PaidKPIs {
   spend: number;
+  budget: number;
   ctr: number;
   cpc: number;
+  cpm: number;
   cpa: number;
   roas: number;
+  impressions: number;
+  totalConversions: number;
+  totalRevenue: number;
 }
 
 export interface SpendConversionPoint {
   date: string;
   spend: number;
+  budget: number;
   conversions: number;
+  impressions: number;
+}
+
+export interface WeeklySpendData {
+  week: string;
+  spend: number;
+  budget: number;
+  pacing: number;
 }
 
 export interface BrandMentionPoint {
@@ -183,21 +197,36 @@ export const mockTrafficData: TrafficDataPoint[] = Array.from({ length: 30 }, (_
 // Paid Ads Tab Data
 export const mockPaidKPIs: PaidKPIs = {
   spend: 67840,
+  budget: 85000,
   ctr: 2.34,
   cpc: 1.87,
+  cpm: 12.40,
   cpa: 17.64,
   roas: 4.2,
+  impressions: 5471000,
+  totalConversions: 3847,
+  totalRevenue: 284930,
 };
 
 export const mockSpendConversions: SpendConversionPoint[] = Array.from({ length: 30 }, (_, i) => {
   const date = new Date();
   date.setDate(date.getDate() - (29 - i));
+  const dailyBudget = 2833;
   return {
     date: date.toISOString().split("T")[0],
     spend: Math.floor(1800 + Math.random() * 600 + (i % 7 === 0 ? 500 : 0)),
+    budget: dailyBudget,
     conversions: Math.floor(90 + Math.random() * 40 + i * 1.5),
+    impressions: Math.floor(150000 + Math.random() * 60000 + i * 3000),
   };
 });
+
+export const mockWeeklySpend: WeeklySpendData[] = [
+  { week: "Week 1", spend: 15200, budget: 21250, pacing: 71.5 },
+  { week: "Week 2", spend: 18400, budget: 21250, pacing: 86.6 },
+  { week: "Week 3", spend: 17800, budget: 21250, pacing: 83.8 },
+  { week: "Week 4", spend: 16440, budget: 21250, pacing: 77.4 },
+];
 
 export const mockCampaigns: CampaignData[] = [
   { campaignName: "Brand Awareness Q1", spend: 18500, ctr: 2.1, conversions: 847, cpa: 21.84, roas: 3.8, revenue: 70300 },
