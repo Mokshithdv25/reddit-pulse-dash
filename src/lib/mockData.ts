@@ -121,6 +121,41 @@ export interface AccountTableRow {
   karmaTrend: number[];
 }
 
+// Competitive Share of Voice
+export interface ShareOfVoiceData {
+  brand: string;
+  mentions: number;
+  sharePercent: number;
+  sentimentScore: number;
+}
+
+export const mockShareOfVoice: ShareOfVoiceData[] = [
+  { brand: "Your Brand", mentions: 872, sharePercent: 38.2, sentimentScore: 72 },
+  { brand: "Competitor A", mentions: 624, sharePercent: 27.3, sentimentScore: 61 },
+  { brand: "Competitor B", mentions: 412, sharePercent: 18.0, sentimentScore: 55 },
+  { brand: "Competitor C", mentions: 376, sharePercent: 16.5, sentimentScore: 48 },
+];
+
+export interface ShareOfVoiceTrend {
+  date: string;
+  "Your Brand": number;
+  "Competitor A": number;
+  "Competitor B": number;
+  "Competitor C": number;
+}
+
+export const mockSOVTrend: ShareOfVoiceTrend[] = Array.from({ length: 30 }, (_, i) => {
+  const date = new Date();
+  date.setDate(date.getDate() - (29 - i));
+  return {
+    date: date.toISOString().split("T")[0],
+    "Your Brand": Math.floor(25 + Math.random() * 12 + (i > 20 ? 5 : 0)),
+    "Competitor A": Math.floor(18 + Math.random() * 10),
+    "Competitor B": Math.floor(10 + Math.random() * 8),
+    "Competitor C": Math.floor(8 + Math.random() * 7),
+  };
+});
+
 // Mock Accounts
 export const mockAccounts: Account[] = [
   { id: "1", name: "u/OfficialBrand" },
