@@ -62,6 +62,11 @@ export default {
           4: "hsl(var(--chart-4))",
           5: "hsl(var(--chart-5))",
         },
+        reddit: {
+          DEFAULT: "hsl(var(--reddit))",
+          foreground: "hsl(var(--reddit-foreground))",
+          dark: "hsl(var(--reddit-dark))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",

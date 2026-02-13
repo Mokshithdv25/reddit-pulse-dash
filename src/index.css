@@ -25,11 +25,15 @@
     --muted: 215 20% 94%;
     --muted-foreground: 215 14% 46%;
 
-    --accent: 24 90% 50%;
+    --accent: 16 100% 50%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
+
+    --reddit: 16 100% 50%;
+    --reddit-foreground: 0 0% 100%;
+    --reddit-dark: 0 0% 7%;
 
     --success: 142 72% 40%;
     --success-foreground: 0 0% 100%;
@@ -43,10 +47,10 @@
 
     --radius: 0.5rem;
 
-    --chart-1: 220 70% 50%;
+    --chart-1: 16 100% 50%;
     --chart-2: 24 90% 50%;
     --chart-3: 142 72% 40%;
-    --chart-4: 280 65% 55%;
+    --chart-4: 220 70% 50%;
     --chart-5: 340 75% 55%;
 
     --sidebar-background: 0 0% 100%;
