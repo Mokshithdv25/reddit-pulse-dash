@@ -238,6 +238,71 @@ export const mockSubredditMentions: SubredditMentions[] = [
   { subreddit: "r/Entrepreneur", mentions: 89, positivePercent: 67, neutralPercent: 25, negativePercent: 8 },
 ];
 
+// Organic Tab - Karma per account KPIs
+export interface OrganicKarmaKPI {
+  account: string;
+  totalKarma: number;
+  postKarma: number;
+  commentKarma: number;
+  karmaVelocity: number;
+}
+
+export const mockOrganicKarmaKPIs: OrganicKarmaKPI[] = [
+  { account: "u/OfficialBrand", totalKarma: 50400, postKarma: 32100, commentKarma: 18300, karmaVelocity: 1260 },
+  { account: "u/ProductUpdates", totalKarma: 35600, postKarma: 24800, commentKarma: 10800, karmaVelocity: 890 },
+  { account: "u/CommunityManager", totalKarma: 34000, postKarma: 18200, commentKarma: 15800, karmaVelocity: 1450 },
+  { account: "u/TechSupport", totalKarma: 20400, postKarma: 8600, commentKarma: 11800, karmaVelocity: 620 },
+];
+
+// Organic Tab - Post scores & upvotes
+export interface PostScoreData {
+  account: string;
+  totalUpvotes: number;
+  avgPostScore: number;
+  topPostScore: number;
+  upvoteRatio: number;
+}
+
+export const mockPostScores: PostScoreData[] = [
+  { account: "u/OfficialBrand", totalUpvotes: 20328, avgPostScore: 847, topPostScore: 3420, upvoteRatio: 0.94 },
+  { account: "u/ProductUpdates", totalUpvotes: 11214, avgPostScore: 623, topPostScore: 2180, upvoteRatio: 0.91 },
+  { account: "u/CommunityManager", totalUpvotes: 18540, avgPostScore: 412, topPostScore: 1870, upvoteRatio: 0.88 },
+  { account: "u/TechSupport", totalUpvotes: 15678, avgPostScore: 234, topPostScore: 980, upvoteRatio: 0.86 },
+];
+
+// Organic Tab - Traffic Attribution
+export interface TrafficAttributionData {
+  account: string;
+  ga4Referrals: number;
+  directTrafficLift: number;
+  goalCompletions: number;
+  attributedRevenue: number;
+}
+
+export const mockTrafficAttribution: TrafficAttributionData[] = [
+  { account: "u/OfficialBrand", ga4Referrals: 42800, directTrafficLift: 12400, goalCompletions: 1847, attributedRevenue: 142300 },
+  { account: "u/ProductUpdates", ga4Referrals: 31200, directTrafficLift: 8900, goalCompletions: 1123, attributedRevenue: 86200 },
+  { account: "u/CommunityManager", ga4Referrals: 18600, directTrafficLift: 5200, goalCompletions: 612, attributedRevenue: 38900 },
+  { account: "u/TechSupport", ga4Referrals: 9400, directTrafficLift: 3100, goalCompletions: 265, attributedRevenue: 17530 },
+];
+
+// Goal completions over time
+export interface GoalCompletionPoint {
+  date: string;
+  goalCompletions: number;
+  revenueAttributed: number;
+}
+
+export const mockGoalCompletions: GoalCompletionPoint[] = Array.from({ length: 30 }, (_, i) => {
+  const date = new Date();
+  date.setDate(date.getDate() - (29 - i));
+  return {
+    date: date.toISOString().split("T")[0],
+    goalCompletions: Math.floor(80 + Math.random() * 50 + i * 2),
+    revenueAttributed: Math.floor(6000 + Math.random() * 3000 + i * 150),
+  };
+});
+
 // Per-Account Tab Data
 export const mockAccountTable: AccountTableRow[] = [
   {
