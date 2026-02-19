@@ -1,52 +1,70 @@
+import { useState, useEffect } from "react";
 import {
-  LineChart,
-  Line,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
+  LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from "recharts";
 import { ChartCard } from "@/components/dashboard/ChartCard";
 import { DataTable, Column } from "@/components/dashboard/DataTable";
 import { KPICard } from "@/components/dashboard/KPICard";
+import { InsightEditor } from "@/components/dashboard/InsightEditor";
+import { LoadingState } from "@/components/dashboard/LoadingState";
+import { EmptyState } from "@/components/dashboard/EmptyState";
+import { DateRange } from "@/components/dashboard/FilterBar";
+import * as dataService from "@/lib/dataService";
 import {
-  mockOrganicMetrics,
-  mockKarmaData,
-  mockPostsPerWeek,
-  mockTrafficData,
-  mockOrganicKarmaKPIs,
-  mockPostScores,
-  mockTrafficAttribution,
-  mockGoalCompletions,
-  OrganicAccountMetrics,
-  PostScoreData,
-  TrafficAttributionData,
-  OrganicKarmaKPI,
-  formatNumber,
-  formatPercent,
-  formatCurrency,
+  OrganicAccountMetrics, KarmaDataPoint, PostsPerWeekData, TrafficDataPoint,
+  OrganicKarmaKPI, PostScoreData, TrafficAttributionData, GoalCompletionPoint,
+  formatNumber, formatPercent, formatCurrency,
 } from "@/lib/mockData";
 
 const accountColors = [
-  "hsl(var(--chart-1))",
-  "hsl(var(--chart-2))",
-  "hsl(var(--chart-3))",
-  "hsl(var(--chart-4))",
+  "hsl(var(--chart-1))", "hsl(var(--chart-2))", "hsl(var(--chart-3))", "hsl(var(--chart-4))",
 ];
-
 const accountKeys = ["u/OfficialBrand", "u/ProductUpdates", "u/CommunityManager", "u/TechSupport"];
 
-// Totals for KPI cards
-const totalKarma = mockOrganicKarmaKPIs.reduce((s, a) => s + a.totalKarma, 0);
-const totalUpvotes = mockPostScores.reduce((s, a) => s + a.totalUpvotes, 0);
-const totalReferrals = mockTrafficAttribution.reduce((s, a) => s + a.ga4Referrals, 0);
-const totalRevenue = mockTrafficAttribution.reduce((s, a) => s + a.attributedRevenue, 0);
+interface TabProps {
+  clientId: string;
+  dateRange: DateRange;
+  insights: Record<string, string>;
+  onInsightsChange: (insights: Record<string, string>) => void;
+}
 
-export function OrganicTab() {
+export function OrganicTab({ clientId, dateRange, insights, onInsightsChange }: TabProps) {
+  const [loading, setLoading] = useState(true);
+  const [karmaKPIs, setKarmaKPIs] = useState<OrganicKarmaKPI[]>([]);
+  const [postScores, setPostScores] = useState<PostScoreData[]>([]);
+  const [metrics, setMetrics] = useState<OrganicAccountMetrics[]>([]);
+  const [karmaData, setKarmaData] = useState<KarmaDataPoint[]>([]);
+  const [postsPerWeek, setPostsPerWeek] = useState<PostsPerWeekData[]>([]);
+  const [trafficData, setTrafficData] = useState<TrafficDataPoint[]>([]);
+  const [trafficAttribution, setTrafficAttribution] = useState<TrafficAttributionData[]>([]);
+  const [goalCompletions, setGoalCompletions] = useState<GoalCompletionPoint[]>([]);
+
+  useEffect(() => {
+    setLoading(true);
+    Promise.all([
+      dataService.getOrganicKarmaKPIs(clientId, dateRange),
+      dataService.getPostScores(clientId, dateRange),
+      dataService.getOrganicMetrics(clientId, dateRange),
+      dataService.getKarmaData(clientId, dateRange),
+      dataService.getPostsPerWeek(clientId, dateRange),
+      dataService.getTrafficData(clientId, dateRange),
+      dataService.getTrafficAttribution(clientId, dateRange),
+      dataService.getGoalCompletions(clientId, dateRange),
+    ]).then(([kk, ps, m, kd, ppw, td, ta, gc]) => {
+      setKarmaKPIs(kk); setPostScores(ps); setMetrics(m); setKarmaData(kd);
+      setPostsPerWeek(ppw); setTrafficData(td); setTrafficAttribution(ta); setGoalCompletions(gc);
+      setLoading(false);
+    });
+  }, [clientId, dateRange]);
+
+  if (loading) return <LoadingState />;
+  if (karmaKPIs.length === 0) return <EmptyState />;
+
+  const totalKarma = karmaKPIs.reduce((s, a) => s + a.totalKarma, 0);
+  const totalUpvotes = postScores.reduce((s, a) => s + a.totalUpvotes, 0);
+  const totalReferrals = trafficAttribution.reduce((s, a) => s + a.ga4Referrals, 0);
+  const totalRevenue = trafficAttribution.reduce((s, a) => s + a.attributedRevenue, 0);
+
   const karmaColumns: Column<OrganicKarmaKPI>[] = [
     { key: "account", header: "Account", sortable: true },
     { key: "totalKarma", header: "Total Karma", sortable: true, align: "right", render: (v) => formatNumber(v as number) },
@@ -80,7 +98,6 @@ export function OrganicTab() {
 
   return (
     <div className="space-y-6">
-      {/* Top-level KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <KPICard label="Total Karma" value={formatNumber(totalKarma)} subtitle="All accounts combined" />
         <KPICard label="Total Upvotes" value={formatNumber(totalUpvotes)} subtitle="Across all posts" />
@@ -88,11 +105,10 @@ export function OrganicTab() {
         <KPICard label="Attributed Revenue" value={formatCurrency(totalRevenue)} subtitle="From organic activity" />
       </div>
 
-      {/* Karma Growth Chart */}
       <ChartCard title="Karma Growth Over Time" subtitle="Account karma progression over the selected period">
         <div className="h-72">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={mockKarmaData}>
+            <LineChart data={karmaData}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <XAxis dataKey="date" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => { const d = new Date(v); return `${d.getMonth() + 1}/${d.getDate()}`; }} stroke="hsl(var(--border))" />
               <YAxis tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} stroke="hsl(var(--border))" tickFormatter={(v) => `${(v / 1000).toFixed(0)}K`} />
@@ -106,29 +122,26 @@ export function OrganicTab() {
         </div>
       </ChartCard>
 
-      {/* Karma Per Account Table */}
       <div>
         <h3 className="text-sm font-semibold text-foreground mb-3">Karma Per Account</h3>
-        <DataTable columns={karmaColumns} data={mockOrganicKarmaKPIs} />
+        <DataTable columns={karmaColumns} data={karmaKPIs} />
       </div>
 
-      {/* Post Scores & Upvotes */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div>
           <h3 className="text-sm font-semibold text-foreground mb-3">Post Scores & Upvotes</h3>
-          <DataTable columns={postScoreColumns} data={mockPostScores} />
+          <DataTable columns={postScoreColumns} data={postScores} />
         </div>
         <div>
           <h3 className="text-sm font-semibold text-foreground mb-3">Reply Counts & Engagement</h3>
-          <DataTable columns={engagementColumns} data={mockOrganicMetrics} />
+          <DataTable columns={engagementColumns} data={metrics} />
         </div>
       </div>
 
-      {/* Posts Per Week */}
       <ChartCard title="Posts Per Account Per Week" subtitle="Weekly posting frequency by account">
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={mockPostsPerWeek}>
+            <BarChart data={postsPerWeek}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <XAxis dataKey="week" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} stroke="hsl(var(--border))" />
               <YAxis tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} stroke="hsl(var(--border))" />
@@ -142,16 +155,13 @@ export function OrganicTab() {
         </div>
       </ChartCard>
 
-      {/* Traffic Attribution Section */}
       <div className="space-y-4">
         <h3 className="text-base font-semibold text-foreground">Traffic Attribution</h3>
-
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* GA4 Referrals & Direct Traffic */}
           <ChartCard title="GA4 Referrals & Direct Traffic Lift" subtitle="reddit.com referrals vs direct traffic correlation">
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={mockTrafficData}>
+                <LineChart data={trafficData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                   <XAxis dataKey="date" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => { const d = new Date(v); return `${d.getMonth() + 1}/${d.getDate()}`; }} stroke="hsl(var(--border))" />
                   <YAxis tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} stroke="hsl(var(--border))" />
@@ -164,11 +174,10 @@ export function OrganicTab() {
             </div>
           </ChartCard>
 
-          {/* Goal Completions & Revenue */}
           <ChartCard title="Goal Completions & Revenue Attribution" subtitle="Conversions and revenue from organic Reddit activity">
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={mockGoalCompletions}>
+                <LineChart data={goalCompletions}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                   <XAxis dataKey="date" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => { const d = new Date(v); return `${d.getMonth() + 1}/${d.getDate()}`; }} stroke="hsl(var(--border))" />
                   <YAxis yAxisId="left" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} stroke="hsl(var(--border))" />
@@ -182,10 +191,10 @@ export function OrganicTab() {
             </div>
           </ChartCard>
         </div>
-
-        {/* Traffic Attribution Table */}
-        <DataTable columns={trafficColumns} data={mockTrafficAttribution} />
+        <DataTable columns={trafficColumns} data={trafficAttribution} />
       </div>
+
+      <InsightEditor tabKey="organic" insights={insights} onInsightsChange={onInsightsChange} defaultText="Organic karma growth steady across all accounts. u/CommunityManager leads in engagement rate at 5.1%. GA4 referrals trending upward with strong revenue attribution." />
     </div>
   );
 }
