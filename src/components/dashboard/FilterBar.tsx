@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CalendarDays, ChevronDown, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,7 +9,7 @@ import {
   DropdownMenuCheckboxItem,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { mockAccounts } from "@/lib/mockData";
+import { Account } from "@/lib/mockData";
 
 export type DateRange = "7d" | "30d" | "90d" | "custom";
 
@@ -18,6 +18,7 @@ interface FilterBarProps {
   onDateRangeChange: (range: DateRange) => void;
   selectedAccounts: string[];
   onAccountsChange: (accounts: string[]) => void;
+  accounts: Account[];
 }
 
 const dateRangeLabels: Record<DateRange, string> = {
@@ -32,6 +33,7 @@ export function FilterBar({
   onDateRangeChange,
   selectedAccounts,
   onAccountsChange,
+  accounts,
 }: FilterBarProps) {
   const toggleAccount = (accountId: string) => {
     if (selectedAccounts.includes(accountId)) {
@@ -42,14 +44,14 @@ export function FilterBar({
   };
 
   const selectAllAccounts = () => {
-    onAccountsChange(mockAccounts.map((a) => a.id));
+    onAccountsChange(accounts.map((a) => a.id));
   };
 
   const selectedCount = selectedAccounts.length;
   const accountLabel =
     selectedCount === 0
       ? "No accounts"
-      : selectedCount === mockAccounts.length
+      : selectedCount === accounts.length
       ? "All accounts"
       : `${selectedCount} account${selectedCount > 1 ? "s" : ""}`;
 
@@ -96,7 +98,7 @@ export function FilterBar({
               Select all
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            {mockAccounts.map((account) => (
+            {accounts.map((account) => (
               <DropdownMenuCheckboxItem
                 key={account.id}
                 checked={selectedAccounts.includes(account.id)}

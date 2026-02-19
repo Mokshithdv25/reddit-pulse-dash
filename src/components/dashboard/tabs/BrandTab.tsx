@@ -1,64 +1,79 @@
+import { useState, useEffect } from "react";
 import {
-  LineChart,
-  Line,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-  PieChart,
-  Pie,
-  Cell,
+  LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, PieChart, Pie, Cell,
 } from "recharts";
 import { ChartCard } from "@/components/dashboard/ChartCard";
 import { DataTable, Column } from "@/components/dashboard/DataTable";
 import { KPICard } from "@/components/dashboard/KPICard";
 import { AlertPanel } from "@/components/dashboard/AlertPanel";
+import { InsightEditor } from "@/components/dashboard/InsightEditor";
+import { LoadingState } from "@/components/dashboard/LoadingState";
+import { EmptyState } from "@/components/dashboard/EmptyState";
+import { DateRange } from "@/components/dashboard/FilterBar";
+import * as dataService from "@/lib/dataService";
 import {
-  mockBrandMentions,
-  mockSentimentData,
-  mockSubredditMentions,
-  mockShareOfVoice,
-  mockSOVTrend,
-  SubredditMentions,
-  ShareOfVoiceData,
-  formatPercent,
-  formatNumber,
+  BrandMentionPoint, SentimentPoint, SubredditMentions, ShareOfVoiceData, ShareOfVoiceTrend,
+  formatPercent, formatNumber,
 } from "@/lib/mockData";
 
-// Calculate aggregate sentiment %
-const totalSentimentPoints = mockSentimentData.reduce(
-  (acc, d) => ({
-    positive: acc.positive + d.positive,
-    neutral: acc.neutral + d.neutral,
-    negative: acc.negative + d.negative,
-  }),
-  { positive: 0, neutral: 0, negative: 0 }
-);
-const sentimentTotal = totalSentimentPoints.positive + totalSentimentPoints.neutral + totalSentimentPoints.negative;
-const sentimentPcts = {
-  positive: ((totalSentimentPoints.positive / sentimentTotal) * 100).toFixed(1),
-  neutral: ((totalSentimentPoints.neutral / sentimentTotal) * 100).toFixed(1),
-  negative: ((totalSentimentPoints.negative / sentimentTotal) * 100).toFixed(1),
-};
-
-const totalMentions = mockBrandMentions.reduce((s, d) => s + d.mentions, 0);
-
 const sovColors = [
-  "hsl(var(--chart-1))",
-  "hsl(var(--chart-2))",
-  "hsl(var(--chart-3))",
-  "hsl(var(--chart-4))",
+  "hsl(var(--chart-1))", "hsl(var(--chart-2))", "hsl(var(--chart-3))", "hsl(var(--chart-4))",
 ];
 
-export function BrandTab() {
+interface TabProps {
+  clientId: string;
+  dateRange: DateRange;
+  insights: Record<string, string>;
+  onInsightsChange: (insights: Record<string, string>) => void;
+}
+
+export function BrandTab({ clientId, dateRange, insights, onInsightsChange }: TabProps) {
+  const [loading, setLoading] = useState(true);
+  const [mentions, setMentions] = useState<BrandMentionPoint[]>([]);
+  const [sentiment, setSentiment] = useState<SentimentPoint[]>([]);
+  const [subredditMentions, setSubredditMentions] = useState<SubredditMentions[]>([]);
+  const [sov, setSov] = useState<ShareOfVoiceData[]>([]);
+  const [sovTrend, setSovTrend] = useState<ShareOfVoiceTrend[]>([]);
+
+  useEffect(() => {
+    setLoading(true);
+    Promise.all([
+      dataService.getBrandMentions(clientId, dateRange),
+      dataService.getSentimentData(clientId, dateRange),
+      dataService.getSubredditMentions(clientId, dateRange),
+      dataService.getShareOfVoice(clientId, dateRange),
+      dataService.getSOVTrend(clientId, dateRange),
+    ]).then(([m, s, sm, sv, svt]) => {
+      setMentions(m); setSentiment(s); setSubredditMentions(sm); setSov(sv); setSovTrend(svt);
+      setLoading(false);
+    });
+  }, [clientId, dateRange]);
+
+  if (loading) return <LoadingState />;
+  if (mentions.length === 0) return <EmptyState />;
+
+  const totalSentimentPoints = sentiment.reduce(
+    (acc, d) => ({ positive: acc.positive + d.positive, neutral: acc.neutral + d.neutral, negative: acc.negative + d.negative }),
+    { positive: 0, neutral: 0, negative: 0 }
+  );
+  const sentimentTotal = totalSentimentPoints.positive + totalSentimentPoints.neutral + totalSentimentPoints.negative;
+  const sentimentPcts = {
+    positive: ((totalSentimentPoints.positive / sentimentTotal) * 100).toFixed(1),
+    neutral: ((totalSentimentPoints.neutral / sentimentTotal) * 100).toFixed(1),
+    negative: ((totalSentimentPoints.negative / sentimentTotal) * 100).toFixed(1),
+  };
+  const totalMentions = mentions.reduce((s, d) => s + d.mentions, 0);
+
+  const pieData = [
+    { name: "Positive", value: totalSentimentPoints.positive, color: "hsl(var(--chart-3))" },
+    { name: "Neutral", value: totalSentimentPoints.neutral, color: "hsl(var(--muted-foreground))" },
+    { name: "Negative", value: totalSentimentPoints.negative, color: "hsl(var(--destructive))" },
+  ];
+
   const subredditColumns: Column<SubredditMentions>[] = [
     { key: "subreddit", header: "Subreddit", sortable: true },
     { key: "mentions", header: "Mentions", sortable: true, align: "right" },
-    { key: "positivePercent", header: "Positive %", sortable: true, align: "right", render: (v) => <span className="text-success">{formatPercent(v as number)}</span> },
+    { key: "positivePercent", header: "Positive %", sortable: true, align: "right", render: (v) => <span className="text-[hsl(var(--success))]">{formatPercent(v as number)}</span> },
     { key: "neutralPercent", header: "Neutral %", sortable: true, align: "right", render: (v) => formatPercent(v as number) },
     { key: "negativePercent", header: "Negative %", sortable: true, align: "right", render: (v) => <span className="text-destructive">{formatPercent(v as number)}</span> },
   ];
@@ -70,21 +85,13 @@ export function BrandTab() {
     { key: "sentimentScore", header: "Sentiment Score", sortable: true, align: "right", render: (v) => `${v}/100` },
   ];
 
-  const pieData = [
-    { name: "Positive", value: totalSentimentPoints.positive, color: "hsl(var(--chart-3))" },
-    { name: "Neutral", value: totalSentimentPoints.neutral, color: "hsl(var(--muted-foreground))" },
-    { name: "Negative", value: totalSentimentPoints.negative, color: "hsl(var(--destructive))" },
-  ];
-
   return (
     <div className="space-y-6">
-      {/* Alert Triggers */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <AlertPanel type="warning" title="Mentions Spike Detected" description="Brand mentions increased 180% on Feb 2-3 compared to weekly average. Investigate the source subreddits." />
         <AlertPanel type="danger" title="Negative Sentiment Increase" description="Negative sentiment rose to 22% (from 12% baseline) in r/marketing discussions. Review recent posts." />
       </div>
 
-      {/* Top-level KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <KPICard label="Total Mentions" value={formatNumber(totalMentions)} subtitle="Over selected period" />
         <KPICard label="Positive" value={`${sentimentPcts.positive}%`} subtitle="Of all mentions" />
@@ -92,12 +99,11 @@ export function BrandTab() {
         <KPICard label="Negative" value={`${sentimentPcts.negative}%`} subtitle="Of all mentions" />
       </div>
 
-      {/* Mentions Volume & Sentiment Pie */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ChartCard title="Mention Volume Over Time" subtitle="Daily mention count across all subreddits">
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={mockBrandMentions}>
+              <LineChart data={mentions}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                 <XAxis dataKey="date" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => { const d = new Date(v); return `${d.getMonth() + 1}/${d.getDate()}`; }} stroke="hsl(var(--border))" />
                 <YAxis tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} stroke="hsl(var(--border))" />
@@ -124,11 +130,10 @@ export function BrandTab() {
         </ChartCard>
       </div>
 
-      {/* Sentiment Trends */}
       <ChartCard title="Sentiment Trends" subtitle="Daily breakdown of positive, neutral, and negative sentiment">
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={mockSentimentData}>
+            <BarChart data={sentiment}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <XAxis dataKey="date" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => { const d = new Date(v); return `${d.getMonth() + 1}/${d.getDate()}`; }} stroke="hsl(var(--border))" />
               <YAxis tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} stroke="hsl(var(--border))" />
@@ -142,20 +147,17 @@ export function BrandTab() {
         </div>
       </ChartCard>
 
-      {/* Subreddit Breakdown */}
       <div>
         <h3 className="text-sm font-semibold text-foreground mb-3">Mentions by Subreddit</h3>
-        <DataTable columns={subredditColumns} data={mockSubredditMentions} />
+        <DataTable columns={subredditColumns} data={subredditMentions} />
       </div>
 
-      {/* Competitive: Share of Voice */}
       <div className="space-y-4">
         <h3 className="text-base font-semibold text-foreground">Competitive: Share of Voice</h3>
-
         <ChartCard title="Share of Voice Over Time" subtitle="Daily mention volume vs competitors">
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={mockSOVTrend}>
+              <LineChart data={sovTrend}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                 <XAxis dataKey="date" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => { const d = new Date(v); return `${d.getMonth() + 1}/${d.getDate()}`; }} stroke="hsl(var(--border))" />
                 <YAxis tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} stroke="hsl(var(--border))" />
@@ -168,9 +170,10 @@ export function BrandTab() {
             </ResponsiveContainer>
           </div>
         </ChartCard>
-
-        <DataTable columns={sovColumns} data={mockShareOfVoice} />
+        <DataTable columns={sovColumns} data={sov} />
       </div>
+
+      <InsightEditor tabKey="brand" insights={insights} onInsightsChange={onInsightsChange} defaultText="Mention spike on Feb 2-3 driven by r/technology discussion. Negative sentiment in r/marketing warrants investigation. Share of voice leading at 38.2%." />
     </div>
   );
 }

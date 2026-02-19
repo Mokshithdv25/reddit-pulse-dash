@@ -1,10 +1,24 @@
 import { cn } from "@/lib/utils";
+import { Download } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
+import { clients, Client } from "@/lib/clients";
 
 type TabType = "overview" | "organic" | "paid" | "brand" | "accounts";
 
 interface DashboardHeaderProps {
   activeTab: TabType;
   onTabChange: (tab: TabType) => void;
+  selectedClientId: string;
+  onClientChange: (clientId: string) => void;
+  onExport: () => void;
+  exporting?: boolean;
 }
 
 const tabs: { id: TabType; label: string }[] = [
@@ -23,7 +37,11 @@ function RedditIcon({ className }: { className?: string }) {
   );
 }
 
-export function DashboardHeader({ activeTab, onTabChange }: DashboardHeaderProps) {
+const selectedClient = (id: string): Client => clients.find((c) => c.id === id) || clients[0];
+
+export function DashboardHeader({ activeTab, onTabChange, selectedClientId, onClientChange, onExport, exporting }: DashboardHeaderProps) {
+  const client = selectedClient(selectedClientId);
+
   return (
     <header className="border-b border-border">
       <div className="px-6 py-4 bg-[hsl(var(--reddit))]">
@@ -34,6 +52,39 @@ export function DashboardHeader({ activeTab, onTabChange }: DashboardHeaderProps
               <span className="font-black tracking-tight">RECHO</span>
               <span className="font-light opacity-90">Reddit Performance Report</span>
             </h1>
+          </div>
+          <div className="flex items-center gap-3">
+            {/* Client Selector */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="secondary" size="sm" className="h-8 gap-2 bg-white/20 text-white border-white/30 hover:bg-white/30">
+                  {client.name}
+                  <ChevronDown className="h-3 w-3 opacity-70" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {clients.map((c) => (
+                  <DropdownMenuItem key={c.id} onClick={() => onClientChange(c.id)}>
+                    <div>
+                      <span className="font-medium">{c.name}</span>
+                      <span className="ml-2 text-xs text-muted-foreground">{c.industry}</span>
+                    </div>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Export Button */}
+            <Button
+              variant="secondary"
+              size="sm"
+              className="h-8 gap-2 bg-white/20 text-white border-white/30 hover:bg-white/30"
+              onClick={onExport}
+              disabled={exporting}
+            >
+              <Download className="h-3.5 w-3.5" />
+              {exporting ? "Exporting..." : "Export Report"}
+            </Button>
           </div>
         </div>
       </div>
