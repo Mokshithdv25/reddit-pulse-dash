@@ -5,16 +5,21 @@ import { OverviewTab } from "@/components/dashboard/tabs/OverviewTab";
 import { OrganicTab } from "@/components/dashboard/tabs/OrganicTab";
 import { PaidAdsTab } from "@/components/dashboard/tabs/PaidAdsTab";
 import { BrandTab } from "@/components/dashboard/tabs/BrandTab";
+import { SubredditTab } from "@/components/dashboard/tabs/SubredditTab";
 import { AccountsTab } from "@/components/dashboard/tabs/AccountsTab";
+import { SEOGEOTab } from "@/components/dashboard/tabs/SEOGEOTab";
 import { clients } from "@/lib/clients";
 import { getAccounts } from "@/lib/dataService";
 import { exportDashboardToPdf } from "@/lib/exportPdf";
 import { Account } from "@/lib/mockData";
 
 const dateRangeLabels: Record<DateRange, string> = {
+  "3d": "Last 3 days",
   "7d": "Last 7 days",
   "30d": "Last 30 days",
   "90d": "Last 90 days",
+  current_month: "Current Month",
+  last_month: "Last Month",
   custom: "Custom",
 };
 
@@ -48,41 +53,22 @@ const Index = () => {
 
   const renderTab = () => {
     switch (activeTab) {
-      case "overview":
-        return <OverviewTab {...tabProps} />;
-      case "organic":
-        return <OrganicTab {...tabProps} />;
-      case "paid":
-        return <PaidAdsTab {...tabProps} />;
-      case "brand":
-        return <BrandTab {...tabProps} />;
-      case "accounts":
-        return <AccountsTab {...tabProps} />;
-      default:
-        return <OverviewTab {...tabProps} />;
+      case "overview": return <OverviewTab {...tabProps} />;
+      case "organic": return <OrganicTab {...tabProps} />;
+      case "paid": return <PaidAdsTab {...tabProps} />;
+      case "brand": return <BrandTab {...tabProps} />;
+      case "subreddit": return <SubredditTab {...tabProps} />;
+      case "accounts": return <AccountsTab {...tabProps} />;
+      case "seogeo": return <SEOGEOTab {...tabProps} />;
+      default: return <OverviewTab {...tabProps} />;
     }
   };
 
   return (
     <div className="min-h-screen bg-background">
-      <DashboardHeader
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        selectedClientId={selectedClientId}
-        onClientChange={setSelectedClientId}
-        onExport={handleExport}
-        exporting={exporting}
-      />
-      <FilterBar
-        dateRange={dateRange}
-        onDateRangeChange={setDateRange}
-        selectedAccounts={selectedAccounts}
-        onAccountsChange={setSelectedAccounts}
-        accounts={accounts}
-      />
-      <main id="dashboard-content" className="p-6">
-        {renderTab()}
-      </main>
+      <DashboardHeader activeTab={activeTab} onTabChange={setActiveTab} selectedClientId={selectedClientId} onClientChange={setSelectedClientId} onExport={handleExport} exporting={exporting} />
+      <FilterBar dateRange={dateRange} onDateRangeChange={setDateRange} selectedAccounts={selectedAccounts} onAccountsChange={setSelectedAccounts} accounts={accounts} />
+      <main id="dashboard-content" className="p-6">{renderTab()}</main>
     </div>
   );
 };

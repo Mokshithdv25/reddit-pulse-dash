@@ -2,15 +2,12 @@ import { cn } from "@/lib/utils";
 import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
 import { clients, Client } from "@/lib/clients";
 
-type TabType = "overview" | "organic" | "paid" | "brand" | "accounts";
+type TabType = "overview" | "organic" | "paid" | "brand" | "subreddit" | "accounts" | "seogeo";
 
 interface DashboardHeaderProps {
   activeTab: TabType;
@@ -26,7 +23,9 @@ const tabs: { id: TabType; label: string }[] = [
   { id: "organic", label: "Organic" },
   { id: "paid", label: "Paid Ads" },
   { id: "brand", label: "Brand" },
+  { id: "subreddit", label: "Subreddit" },
   { id: "accounts", label: "Accounts" },
+  { id: "seogeo", label: "SEO / GEO" },
 ];
 
 function RedditIcon({ className }: { className?: string }) {
@@ -41,7 +40,6 @@ const selectedClient = (id: string): Client => clients.find((c) => c.id === id) 
 
 export function DashboardHeader({ activeTab, onTabChange, selectedClientId, onClientChange, onExport, exporting }: DashboardHeaderProps) {
   const client = selectedClient(selectedClientId);
-
   return (
     <header className="border-b border-border">
       <div className="px-6 py-4 bg-[hsl(var(--reddit))]">
@@ -50,56 +48,35 @@ export function DashboardHeader({ activeTab, onTabChange, selectedClientId, onCl
             <h1 className="text-xl text-white flex items-center gap-3">
               <RedditIcon className="w-7 h-7" />
               <span className="font-black tracking-tight">RECHO</span>
-              <span className="font-light opacity-90">Reddit Performance Report</span>
+              <span className="font-light opacity-90">Reddit Growth Intelligence</span>
             </h1>
           </div>
           <div className="flex items-center gap-3">
-            {/* Client Selector */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="secondary" size="sm" className="h-8 gap-2 bg-white/20 text-white border-white/30 hover:bg-white/30">
-                  {client.name}
-                  <ChevronDown className="h-3 w-3 opacity-70" />
+                  {client.name}<ChevronDown className="h-3 w-3 opacity-70" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 {clients.map((c) => (
                   <DropdownMenuItem key={c.id} onClick={() => onClientChange(c.id)}>
-                    <div>
-                      <span className="font-medium">{c.name}</span>
-                      <span className="ml-2 text-xs text-muted-foreground">{c.industry}</span>
-                    </div>
+                    <span className="font-medium">{c.name}</span>
+                    <span className="ml-2 text-xs text-muted-foreground">{c.industry}</span>
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
-
-            {/* Export Button */}
-            <Button
-              variant="secondary"
-              size="sm"
-              className="h-8 gap-2 bg-white/20 text-white border-white/30 hover:bg-white/30"
-              onClick={onExport}
-              disabled={exporting}
-            >
-              <Download className="h-3.5 w-3.5" />
-              {exporting ? "Exporting..." : "Export Report"}
+            <Button variant="secondary" size="sm" className="h-8 gap-2 bg-white/20 text-white border-white/30 hover:bg-white/30" onClick={onExport} disabled={exporting}>
+              <Download className="h-3.5 w-3.5" />{exporting ? "Exporting..." : "Export Report"}
             </Button>
           </div>
         </div>
       </div>
-      
-      <nav className="px-6">
+      <nav className="px-6 overflow-x-auto">
         <div className="tab-nav inline-flex">
           {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => onTabChange(tab.id)}
-              className={cn(
-                "tab-nav-item",
-                activeTab === tab.id && "tab-nav-item-active"
-              )}
-            >
+            <button key={tab.id} onClick={() => onTabChange(tab.id)} className={cn("tab-nav-item whitespace-nowrap", activeTab === tab.id && "tab-nav-item-active")}>
               {tab.label}
             </button>
           ))}
