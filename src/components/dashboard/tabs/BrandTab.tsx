@@ -7,18 +7,18 @@ import { DataTable, Column } from "@/components/dashboard/DataTable";
 import { KPICard } from "@/components/dashboard/KPICard";
 import { AlertPanel } from "@/components/dashboard/AlertPanel";
 import { InsightEditor } from "@/components/dashboard/InsightEditor";
+import { ExecutiveSummary } from "@/components/dashboard/ExecutiveSummary";
 import { LoadingState } from "@/components/dashboard/LoadingState";
 import { EmptyState } from "@/components/dashboard/EmptyState";
 import { DateRange } from "@/components/dashboard/FilterBar";
 import * as dataService from "@/lib/dataService";
 import {
   BrandMentionPoint, SentimentPoint, SubredditMentions, ShareOfVoiceData, ShareOfVoiceTrend,
+  TopBrandMention,
   formatPercent, formatNumber,
 } from "@/lib/mockData";
 
-const sovColors = [
-  "hsl(var(--chart-1))", "hsl(var(--chart-2))", "hsl(var(--chart-3))", "hsl(var(--chart-4))",
-];
+const sovColors = ["hsl(var(--chart-1))", "hsl(var(--chart-2))", "hsl(var(--chart-3))", "hsl(var(--chart-4))"];
 
 interface TabProps {
   clientId: string;
@@ -34,6 +34,8 @@ export function BrandTab({ clientId, dateRange, insights, onInsightsChange }: Ta
   const [subredditMentions, setSubredditMentions] = useState<SubredditMentions[]>([]);
   const [sov, setSov] = useState<ShareOfVoiceData[]>([]);
   const [sovTrend, setSovTrend] = useState<ShareOfVoiceTrend[]>([]);
+  const [positiveMentions, setPositiveMentions] = useState<TopBrandMention[]>([]);
+  const [negativeMentions, setNegativeMentions] = useState<TopBrandMention[]>([]);
 
   useEffect(() => {
     setLoading(true);
@@ -43,8 +45,11 @@ export function BrandTab({ clientId, dateRange, insights, onInsightsChange }: Ta
       dataService.getSubredditMentions(clientId, dateRange),
       dataService.getShareOfVoice(clientId, dateRange),
       dataService.getSOVTrend(clientId, dateRange),
-    ]).then(([m, s, sm, sv, svt]) => {
+      dataService.getTopPositiveMentions(clientId, dateRange),
+      dataService.getTopNegativeMentions(clientId, dateRange),
+    ]).then(([m, s, sm, sv, svt, pm, nm]) => {
       setMentions(m); setSentiment(s); setSubredditMentions(sm); setSov(sv); setSovTrend(svt);
+      setPositiveMentions(pm); setNegativeMentions(nm);
       setLoading(false);
     });
   }, [clientId, dateRange]);
@@ -87,9 +92,11 @@ export function BrandTab({ clientId, dateRange, insights, onInsightsChange }: Ta
 
   return (
     <div className="space-y-6">
+      <ExecutiveSummary tabKey="brand" dateRange={dateRange} clientId={clientId} />
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <AlertPanel type="warning" title="Mentions Spike Detected" description="Brand mentions increased 180% on Feb 2-3 compared to weekly average. Investigate the source subreddits." />
-        <AlertPanel type="danger" title="Negative Sentiment Increase" description="Negative sentiment rose to 22% (from 12% baseline) in r/marketing discussions. Review recent posts." />
+        <AlertPanel type="warning" title="Mentions Spike Detected" description="Brand mentions increased 180% on Feb 2-3 compared to weekly average." />
+        <AlertPanel type="danger" title="Negative Sentiment Increase" description="Negative sentiment rose to 22% in r/marketing discussions." />
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -119,9 +126,7 @@ export function BrandTab({ clientId, dateRange, insights, onInsightsChange }: Ta
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie data={pieData} cx="50%" cy="50%" innerRadius={60} outerRadius={90} paddingAngle={3} dataKey="value" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
-                  {pieData.map((entry, index) => (
-                    <Cell key={index} fill={entry.color} />
-                  ))}
+                  {pieData.map((entry, index) => (<Cell key={index} fill={entry.color} />))}
                 </Pie>
                 <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: "8px", fontSize: "12px" }} />
               </PieChart>
@@ -146,6 +151,48 @@ export function BrandTab({ clientId, dateRange, insights, onInsightsChange }: Ta
           </ResponsiveContainer>
         </div>
       </ChartCard>
+
+      {/* Top Mentions */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-card border border-border rounded-lg p-4">
+          <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-[hsl(var(--success))]" />
+            Top 5 Positive Mentions
+          </h4>
+          <div className="space-y-3">
+            {positiveMentions.map((m, i) => (
+              <div key={i} className="border-b border-border pb-3 last:border-0 last:pb-0">
+                <p className="text-sm text-foreground italic">"{m.excerpt}"</p>
+                <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+                  <span>{m.subreddit}</span>
+                  <span>↑{m.upvotes}</span>
+                  <span>💬{m.comments}</span>
+                  <span>{m.date}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="bg-card border border-border rounded-lg p-4">
+          <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-destructive" />
+            Top 5 Negative Mentions
+          </h4>
+          <div className="space-y-3">
+            {negativeMentions.map((m, i) => (
+              <div key={i} className="border-b border-border pb-3 last:border-0 last:pb-0">
+                <p className="text-sm text-foreground italic">"{m.excerpt}"</p>
+                <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+                  <span>{m.subreddit}</span>
+                  <span>↑{m.upvotes}</span>
+                  <span>💬{m.comments}</span>
+                  <span>{m.date}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
 
       <div>
         <h3 className="text-sm font-semibold text-foreground mb-3">Mentions by Subreddit</h3>
