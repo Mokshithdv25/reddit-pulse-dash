@@ -1,73 +1,81 @@
-# Welcome to your Lovable project
+# Reddit Pulse Dashboard
 
-## Project info
+A Reddit Growth Intelligence dashboard for tracking organic and paid Reddit performance, brand sentiment, subreddit analytics, and SEO/GEO visibility — built with Next.js and shadcn/ui.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Features
 
-## How can I edit this code?
+- **Overview** — KPIs (traffic, conversions, revenue, ROAS, karma growth), executive summary, time-series charts
+- **Organic** — Account-level post metrics, karma tracking, post scores, traffic attribution, goal completions
+- **Paid Ads** — Campaign spend/budget pacing, CTR, CPC, CPM, CPA, ROAS, creative performance
+- **Brand** — Mention volume, sentiment analysis, subreddit breakdown, share of voice vs competitors
+- **Subreddit** — Follower growth, engagement metrics, post-level performance table
+- **Accounts** — Multi-account performance table with sparklines and revenue attribution
+- **SEO / GEO** — LLM referrals, search visibility tracking
 
-There are several ways of editing your application.
+Additional capabilities:
+- Multi-client switching (Acme Corp / Globex Inc)
+- Date range filtering (3d / 7d / 30d / 90d / month)
+- PDF report export
+- Dark mode support via CSS variables
 
-**Use Lovable**
+## Tech Stack
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+- **Framework**: [Next.js 14](https://nextjs.org/) (App Router)
+- **Language**: TypeScript
+- **UI Components**: [shadcn/ui](https://ui.shadcn.com/)
+- **Styling**: [Tailwind CSS 3](https://tailwindcss.com/)
+- **Charts**: [Recharts](https://recharts.org/)
+- **State**: [TanStack React Query](https://tanstack.com/query)
+- **Icons**: [Lucide React](https://lucide.dev/)
 
-Changes made via Lovable will be committed automatically to this repo.
+## Getting Started
 
-**Use your preferred IDE**
+Prerequisites: Node.js 18+ and npm.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+```bash
+# Install dependencies
+npm install
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Scripts
 
-**Use GitHub Codespaces**
+| Command | Description |
+|---|---|
+| `npm run dev` | Start dev server |
+| `npm run build` | Production build |
+| `npm run start` | Start production server |
+| `npm run lint` | Run Next.js linter |
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Project Structure
 
-## What technologies are used for this project?
+```
+├── app/
+│   ├── globals.css          # Tailwind + CSS design tokens
+│   ├── layout.tsx           # Root layout with providers
+│   ├── not-found.tsx        # 404 page
+│   └── page.tsx             # Dashboard (home)
+├── components/
+│   ├── dashboard/           # Dashboard-specific components
+│   │   ├── tabs/            # 7 tab views
+│   │   ├── DashboardHeader.tsx
+│   │   ├── FilterBar.tsx
+│   │   ├── KPICard.tsx
+│   │   └── ...
+│   └── ui/                  # shadcn/ui components
+├── hooks/                   # Custom React hooks
+├── lib/                     # Data services, utilities, mock data
+└── public/                  # Static assets
+```
 
-This project is built with:
+## Deployment
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+This project is configured for deployment on [Vercel](https://vercel.com/). Push to `main` to deploy automatically.
 
-## How can I deploy this project?
+## License
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Private project.
