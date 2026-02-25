@@ -4,19 +4,61 @@ A Reddit Growth Intelligence dashboard for tracking organic and paid Reddit perf
 
 ## Features
 
-- **Overview** — KPIs (traffic, conversions, revenue, ROAS, karma growth), executive summary, time-series charts
-- **Organic** — Account-level post metrics, karma tracking, post scores, traffic attribution, goal completions
-- **Paid Ads** — Campaign spend/budget pacing, CTR, CPC, CPM, CPA, ROAS, creative performance
-- **Brand** — Mention volume, sentiment analysis, subreddit breakdown, share of voice vs competitors
-- **Subreddit** — Follower growth, engagement metrics, post-level performance table
-- **Accounts** — Multi-account performance table with sparklines and revenue attribution
-- **SEO / GEO** — LLM referrals, search visibility tracking
+### 📊 Overview Dashboard
+KPIs (traffic, conversions, revenue, ROAS, karma growth), executive summary, and time-series charts showing Reddit activity vs traffic vs conversions.
 
-Additional capabilities:
-- Multi-client switching (Acme Corp / Globex Inc)
-- Date range filtering (3d / 7d / 30d / 90d / month)
-- PDF report export
-- Dark mode support via CSS variables
+![Overview Dashboard](public/screenshots/overview.png)
+
+---
+
+### 🌱 Organic Performance
+Account-level post metrics, karma tracking, post scores, traffic attribution, goal completions, and subreddit-level engagement breakdowns.
+
+![Organic Performance](public/screenshots/organic.png)
+
+---
+
+### 💰 Paid Ads Analytics
+Campaign spend/budget pacing, CTR, CPC, CPM, CPA, ROAS, and creative performance tracking with conversion funnels.
+
+![Paid Ads Analytics](public/screenshots/paid-ads.png)
+
+---
+
+### 🏷️ Brand Monitoring
+Mention volume tracking, sentiment analysis (positive/neutral/negative), subreddit breakdown, share of voice vs competitors, and real-time alerts.
+
+![Brand Monitoring](public/screenshots/brand.png)
+
+---
+
+### 📡 Subreddit Analytics
+Follower growth curves, engagement metrics, post impressions over time, and business impact tracking (traffic, conversions, revenue).
+
+![Subreddit Analytics](public/screenshots/subreddit.png)
+
+---
+
+### 👥 Accounts
+Multi-account performance table with sparklines, revenue attribution, engagement rates, and period-over-period change tracking.
+
+![Accounts](public/screenshots/accounts.png)
+
+---
+
+### 🔍 SEO / GEO
+LLM referral traffic tracking (ChatGPT, Perplexity, Gemini), Reddit visibility index, search visibility scoring, and AI-referred session analytics.
+
+![SEO / GEO](public/screenshots/seo-geo.png)
+
+---
+
+### Additional Capabilities
+
+- 🔄 **Multi-client switching** — Acme Corp / Globex Inc
+- 📅 **Date range filtering** — 3d / 7d / 30d / 90d / month
+- 📄 **PDF report export**
+- 🌙 **Dark mode support** via CSS variables
 
 ## Tech Stack
 
