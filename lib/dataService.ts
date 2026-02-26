@@ -1,7 +1,8 @@
 // Data Service Abstraction Layer
-// Currently returns mock data. Swap internals to Supabase later without touching components.
+// Supabase-backed where available, mock fallback elsewhere.
 
 import { DateRange } from "@/components/dashboard/FilterBar";
+import { supabase } from "@/lib/supabaseClient";
 import {
   mockKPIs, mockTimeSeriesData, mockOrganicMetrics, mockKarmaData, mockPostsPerWeek,
   mockTrafficData, mockOrganicKarmaKPIs, mockPostScores, mockTrafficAttribution,
@@ -55,8 +56,37 @@ const CLIENT_FACTORS: Record<string, number> = { "acme-corp": 1, "globex-inc": 0
 function factor(clientId: string): number { return CLIENT_FACTORS[clientId] ?? 1; }
 function delay<T>(data: T): Promise<T> { return new Promise((resolve) => setTimeout(() => resolve(data), 300)); }
 
-// ─── Overview ────────────────────────────────────────────────────
-export async function getOverview(clientId: string, _dateRange: DateRange): Promise<KPIData> { return delay(scaleKPIs(mockKPIs, factor(clientId))); }
+// ─── Overview (LIVE — Supabase) ─────────────────────────────────
+export async function getOverview(clientId: string, _dateRange: DateRange): Promise<KPIData> {
+  const { data, error } = await supabase
+    .from('overview_snapshots')
+    .select('*')
+    .eq('client_id', clientId)
+    .order('date', { ascending: false })
+    .limit(1)
+    .single();
+
+  if (error || !data) {
+    console.error('Supabase getOverview error:', error);
+    // Fallback to mock so dashboard doesn't break
+    return delay(scaleKPIs(mockKPIs, factor(clientId)));
+  }
+
+  return {
+    totalTraffic: data.total_traffic,
+    totalConversions: data.total_conversions,
+    revenue: Number(data.revenue),
+    blendedROAS: Number(data.blended_roas),
+    karmaGrowth: data.karma_growth,
+    previousPeriod: {
+      totalTraffic: 0,
+      totalConversions: 0,
+      revenue: 0,
+      blendedROAS: 0,
+      karmaGrowth: 0,
+    },
+  };
+}
 export async function getTimeSeries(clientId: string, _dateRange: DateRange): Promise<TimeSeriesPoint[]> { return delay(scaleSeries(mockTimeSeriesData, factor(clientId))); }
 
 // ─── Organic ─────────────────────────────────────────────────────
