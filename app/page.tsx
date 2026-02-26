@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { DateRange as DayPickerRange } from "react-day-picker";
 import { DashboardHeader, TabType } from "@/components/dashboard/DashboardHeader";
 import { FilterBar, DateRange } from "@/components/dashboard/FilterBar";
 import { OverviewTab } from "@/components/dashboard/tabs/OverviewTab";
@@ -31,6 +32,7 @@ export default function HomePage() {
     const [selectedClientId, setSelectedClientId] = useState(clients[0].id);
     const [accounts, setAccounts] = useState<Account[]>([]);
     const [selectedAccounts, setSelectedAccounts] = useState<string[]>([]);
+    const [customDateRange, setCustomDateRange] = useState<DayPickerRange | undefined>();
 
     const [exporting, setExporting] = useState(false);
 
@@ -69,7 +71,7 @@ export default function HomePage() {
     return (
         <div className="min-h-screen bg-background">
             <DashboardHeader activeTab={activeTab} onTabChange={setActiveTab} selectedClientId={selectedClientId} onClientChange={setSelectedClientId} onExport={handleExport} exporting={exporting} />
-            <FilterBar dateRange={dateRange} onDateRangeChange={setDateRange} selectedAccounts={selectedAccounts} onAccountsChange={setSelectedAccounts} accounts={accounts} />
+            <FilterBar dateRange={dateRange} onDateRangeChange={setDateRange} customDateRange={customDateRange} onCustomDateRangeChange={setCustomDateRange} selectedAccounts={selectedAccounts} onAccountsChange={setSelectedAccounts} accounts={accounts} />
             <main id="dashboard-content" className="p-6">{renderTab()}</main>
         </div>
     );
