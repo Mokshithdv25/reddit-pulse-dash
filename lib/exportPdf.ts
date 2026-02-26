@@ -1,6 +1,12 @@
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
+/** JPEG quality for PDF export (0–1). Lower = smaller file, slightly less sharp. */
+const JPEG_QUALITY = 0.82;
+
+/** Scale for html2canvas (1 = 96dpi, 1.5 = good balance, 2 = very large files). */
+const CANVAS_SCALE = 1.5;
+
 export async function exportDashboardToPdf(
   elementId: string,
   clientName: string,
@@ -14,7 +20,7 @@ export async function exportDashboardToPdf(
   element.style.color = "black";
 
   const canvas = await html2canvas(element, {
-    scale: 2,
+    scale: CANVAS_SCALE,
     useCORS: true,
     backgroundColor: "#ffffff",
     logging: false,
@@ -23,10 +29,10 @@ export async function exportDashboardToPdf(
   element.style.backgroundColor = "";
   element.style.color = "";
 
-  const imgData = canvas.toDataURL("image/png");
   const imgWidth = 210; // A4 width in mm
   const pageHeight = 297; // A4 height in mm
-  const imgHeight = (canvas.height * imgWidth) / canvas.width;
+  const marginTop = 28;
+  const imgHeightMm = (canvas.height * imgWidth) / canvas.width;
 
   const pdf = new jsPDF("p", "mm", "a4");
 
@@ -38,17 +44,29 @@ export async function exportDashboardToPdf(
   pdf.text(`Date Range: ${dateRange} | Generated: ${new Date().toLocaleDateString()}`, 14, 22);
   pdf.setTextColor(0);
 
-  let heightLeft = imgHeight;
-  let position = 28;
+  // Slice the long canvas into one image per page so we don't embed the full image on every page (was causing huge PDFs).
+  const pageHeightPx = (pageHeight - marginTop) * (canvas.width / imgWidth);
+  const totalPages = Math.ceil(canvas.height / pageHeightPx) || 1;
 
-  pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-  heightLeft -= pageHeight - position;
+  for (let page = 0; page < totalPages; page++) {
+    if (page > 0) pdf.addPage();
 
-  while (heightLeft > 0) {
-    position = heightLeft - imgHeight;
-    pdf.addPage();
-    pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-    heightLeft -= pageHeight;
+    const srcY = page * pageHeightPx;
+    const sliceHeight = Math.min(pageHeightPx, canvas.height - srcY);
+
+    const sliceCanvas = document.createElement("canvas");
+    sliceCanvas.width = canvas.width;
+    sliceCanvas.height = sliceHeight;
+    const ctx = sliceCanvas.getContext("2d");
+    if (!ctx) continue;
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
+    ctx.drawImage(canvas, 0, srcY, canvas.width, sliceHeight, 0, 0, canvas.width, sliceHeight);
+
+    const imgData = sliceCanvas.toDataURL("image/jpeg", JPEG_QUALITY);
+    const sliceHeightMm = (sliceHeight * imgWidth) / canvas.width;
+
+    pdf.addImage(imgData, "JPEG", 0, marginTop, imgWidth, sliceHeightMm);
   }
 
   pdf.save(`${clientName.replace(/\s+/g, "_")}_Reddit_Report_${dateRange}.pdf`);
