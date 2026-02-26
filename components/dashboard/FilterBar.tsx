@@ -36,6 +36,7 @@ const presetRanges: { value: DateRange; label: string }[] = [
 export function FilterBar({ dateRange, onDateRangeChange, customDateRange, onCustomDateRangeChange, selectedAccounts, onAccountsChange, accounts }: FilterBarProps) {
   const [lastUpdated, setLastUpdated] = useState(new Date());
   const [datePickerOpen, setDatePickerOpen] = useState(false);
+  const [showCalendar, setShowCalendar] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => setLastUpdated(new Date()), 30 * 60 * 1000);
@@ -45,6 +46,7 @@ export function FilterBar({ dateRange, onDateRangeChange, customDateRange, onCus
   const handlePresetClick = (range: DateRange) => {
     onDateRangeChange(range);
     onCustomDateRangeChange?.(undefined);
+    setShowCalendar(false);
     setDatePickerOpen(false);
   };
 
@@ -90,7 +92,7 @@ export function FilterBar({ dateRange, onDateRangeChange, customDateRange, onCus
       <div className="flex items-center gap-2">
         <span className="text-xs font-medium text-muted-foreground">Filters:</span>
 
-        <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
+        <Popover open={datePickerOpen} onOpenChange={(open) => { setDatePickerOpen(open); if (!open) setShowCalendar(false); }}>
           <PopoverTrigger asChild>
             <Button variant="outline" size="sm" className="h-8 gap-2">
               <CalendarDays className="h-3.5 w-3.5" />
@@ -100,14 +102,14 @@ export function FilterBar({ dateRange, onDateRangeChange, customDateRange, onCus
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
             <div className="flex">
-              <div className="border-r py-2 space-y-0.5 min-w-[150px]">
+              <div className={cn("py-2 space-y-0.5 min-w-[150px]", showCalendar && "border-r")}>
                 {presetRanges.map(({ value, label }) => (
                   <button
                     key={value}
                     onClick={() => handlePresetClick(value)}
                     className={cn(
                       "flex w-full items-center rounded-none px-3 py-1.5 text-sm transition-colors hover:bg-accent",
-                      dateRange === value ? "bg-accent font-medium" : ""
+                      dateRange === value && !showCalendar ? "bg-accent font-medium" : ""
                     )}
                   >
                     {label}
@@ -117,23 +119,25 @@ export function FilterBar({ dateRange, onDateRangeChange, customDateRange, onCus
                 <button
                   className={cn(
                     "flex w-full items-center rounded-none px-3 py-1.5 text-sm transition-colors hover:bg-accent",
-                    dateRange === "custom" ? "bg-accent font-medium" : ""
+                    showCalendar || dateRange === "custom" ? "bg-accent font-medium" : ""
                   )}
-                  onClick={() => onDateRangeChange("custom")}
+                  onClick={() => { setShowCalendar(true); onDateRangeChange("custom"); }}
                 >
                   Custom Range
                 </button>
               </div>
-              <div className="p-2">
-                <Calendar
-                  mode="range"
-                  selected={customDateRange}
-                  onSelect={handleCustomRangeSelect}
-                  numberOfMonths={2}
-                  disabled={{ after: new Date() }}
-                  defaultMonth={customDateRange?.from ?? new Date(new Date().getFullYear(), new Date().getMonth() - 1)}
-                />
-              </div>
+              {showCalendar && (
+                <div className="p-2">
+                  <Calendar
+                    mode="range"
+                    selected={customDateRange}
+                    onSelect={handleCustomRangeSelect}
+                    numberOfMonths={2}
+                    disabled={{ after: new Date() }}
+                    defaultMonth={customDateRange?.from ?? new Date(new Date().getFullYear(), new Date().getMonth() - 1)}
+                  />
+                </div>
+              )}
             </div>
           </PopoverContent>
         </Popover>
@@ -144,13 +148,13 @@ export function FilterBar({ dateRange, onDateRangeChange, customDateRange, onCus
               {accountLabel}<ChevronDown className="h-3 w-3 opacity-50" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-48">
-            <DropdownMenuCheckboxItem checked={allSelected} onCheckedChange={toggleAllAccounts}>
+          <DropdownMenuContent align="start" className="w-48" onCloseAutoFocus={(e) => e.preventDefault()}>
+            <DropdownMenuCheckboxItem checked={allSelected} onCheckedChange={toggleAllAccounts} onSelect={(e) => e.preventDefault()}>
               Select All
             </DropdownMenuCheckboxItem>
             <DropdownMenuSeparator />
             {accounts.map((account) => (
-              <DropdownMenuCheckboxItem key={account.id} checked={selectedAccounts.includes(account.id)} onCheckedChange={() => toggleAccount(account.id)}>
+              <DropdownMenuCheckboxItem key={account.id} checked={selectedAccounts.includes(account.id)} onCheckedChange={() => toggleAccount(account.id)} onSelect={(e) => e.preventDefault()}>
                 {account.name}
               </DropdownMenuCheckboxItem>
             ))}
