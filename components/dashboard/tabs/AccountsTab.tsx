@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { DataTable, Column } from "@/components/dashboard/DataTable";
 import { Sparkline } from "@/components/dashboard/Sparkline";
-import { InsightEditor } from "@/components/dashboard/InsightEditor";
+
 import { ExecutiveSummary } from "@/components/dashboard/ExecutiveSummary";
 import { LoadingState } from "@/components/dashboard/LoadingState";
 import { EmptyState } from "@/components/dashboard/EmptyState";
@@ -15,11 +15,9 @@ import {
 interface TabProps {
   clientId: string;
   dateRange: DateRange;
-  insights: Record<string, string>;
-  onInsightsChange: (insights: Record<string, string>) => void;
 }
 
-export function AccountsTab({ clientId, dateRange, insights, onInsightsChange }: TabProps) {
+export function AccountsTab({ clientId, dateRange }: TabProps) {
   const [loading, setLoading] = useState(true);
   const [accounts, setAccounts] = useState<AccountTableRow[]>([]);
 
@@ -42,14 +40,18 @@ export function AccountsTab({ clientId, dateRange, insights, onInsightsChange }:
     { key: "trafficContribution", header: "Traffic", sortable: true, align: "right", render: (value) => formatNumber(value as number) },
     { key: "attributedConversions", header: "Conversions", sortable: true, align: "right", render: (value) => (value as number).toLocaleString() },
     { key: "attributedRevenue", header: "Revenue", sortable: true, align: "right", render: (value) => formatCurrency(value as number) },
-    { key: "deltaConversions", header: "Δ Conv.", sortable: true, align: "right", render: (value) => {
-      const v = value as number;
-      return <span className={v >= 0 ? "text-[hsl(var(--success))]" : "text-destructive"}>{v >= 0 ? "+" : ""}{v.toFixed(1)}%</span>;
-    }},
-    { key: "deltaRevenue", header: "Δ Rev.", sortable: true, align: "right", render: (value) => {
-      const v = value as number;
-      return <span className={v >= 0 ? "text-[hsl(var(--success))]" : "text-destructive"}>{v >= 0 ? "+" : ""}{v.toFixed(1)}%</span>;
-    }},
+    {
+      key: "deltaConversions", header: "Δ Conv.", sortable: true, align: "right", render: (value) => {
+        const v = value as number;
+        return <span className={v >= 0 ? "text-[hsl(var(--success))]" : "text-destructive"}>{v >= 0 ? "+" : ""}{v.toFixed(1)}%</span>;
+      }
+    },
+    {
+      key: "deltaRevenue", header: "Δ Rev.", sortable: true, align: "right", render: (value) => {
+        const v = value as number;
+        return <span className={v >= 0 ? "text-[hsl(var(--success))]" : "text-destructive"}>{v >= 0 ? "+" : ""}{v.toFixed(1)}%</span>;
+      }
+    },
     { key: "karmaTrend", header: "Trend", align: "center", render: (_, row) => <Sparkline data={row.karmaTrend} className="h-6 w-20 inline-block" /> },
   ];
 
@@ -106,7 +108,7 @@ export function AccountsTab({ clientId, dateRange, insights, onInsightsChange }:
         ))}
       </div>
 
-      <InsightEditor tabKey="accounts" insights={insights} onInsightsChange={onInsightsChange} defaultText="u/CommunityManager showing strongest growth trajectory. u/OfficialBrand leads revenue at 50% of total. All accounts trending positive on conversions delta." />
+
     </div>
   );
 }

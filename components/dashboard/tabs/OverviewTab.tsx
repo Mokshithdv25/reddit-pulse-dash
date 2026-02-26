@@ -5,7 +5,7 @@ import {
 import { KPICard } from "@/components/dashboard/KPICard";
 import { ChartCard } from "@/components/dashboard/ChartCard";
 import { DataTable, Column } from "@/components/dashboard/DataTable";
-import { InsightEditor } from "@/components/dashboard/InsightEditor";
+
 import { ExecutiveSummary } from "@/components/dashboard/ExecutiveSummary";
 import { LoadingState } from "@/components/dashboard/LoadingState";
 import { EmptyState } from "@/components/dashboard/EmptyState";
@@ -20,11 +20,9 @@ import {
 interface TabProps {
   clientId: string;
   dateRange: DateRange;
-  insights: Record<string, string>;
-  onInsightsChange: (insights: Record<string, string>) => void;
 }
 
-export function OverviewTab({ clientId, dateRange, insights, onInsightsChange }: TabProps) {
+export function OverviewTab({ clientId, dateRange }: TabProps) {
   const [loading, setLoading] = useState(true);
   const [kpis, setKpis] = useState<KPIData | null>(null);
   const [timeSeries, setTimeSeries] = useState<TimeSeriesPoint[]>([]);
@@ -113,7 +111,7 @@ export function OverviewTab({ clientId, dateRange, insights, onInsightsChange }:
         </div>
       )}
 
-      <InsightEditor tabKey="overview" insights={insights} onInsightsChange={onInsightsChange} defaultText="Reddit-driven traffic up 13.4%, led by 2 high-performing posts in r/technology. Conversion rate improved from 2.8% → 3.0% (+7.1%). Community growth accelerating — karma velocity +20% WoW." />
+
     </div>
   );
 }

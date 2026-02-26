@@ -5,7 +5,7 @@ import {
 import { KPICard } from "@/components/dashboard/KPICard";
 import { ChartCard } from "@/components/dashboard/ChartCard";
 import { DataTable, Column } from "@/components/dashboard/DataTable";
-import { InsightEditor } from "@/components/dashboard/InsightEditor";
+
 import { ExecutiveSummary } from "@/components/dashboard/ExecutiveSummary";
 import { LoadingState } from "@/components/dashboard/LoadingState";
 import { EmptyState } from "@/components/dashboard/EmptyState";
@@ -19,11 +19,9 @@ import {
 interface TabProps {
   clientId: string;
   dateRange: DateRange;
-  insights: Record<string, string>;
-  onInsightsChange: (insights: Record<string, string>) => void;
 }
 
-export function PaidAdsTab({ clientId, dateRange, insights, onInsightsChange }: TabProps) {
+export function PaidAdsTab({ clientId, dateRange }: TabProps) {
   const [loading, setLoading] = useState(true);
   const [kpis, setKpis] = useState<PaidKPIs | null>(null);
   const [spendData, setSpendData] = useState<SpendConversionPoint[]>([]);
@@ -88,12 +86,12 @@ export function PaidAdsTab({ clientId, dateRange, insights, onInsightsChange }: 
       <ExecutiveSummary tabKey="paid" dateRange={dateRange} clientId={clientId} />
 
       <div>
-        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Spend & Budget</h3>
+        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Conversions</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <KPICard label="Total Spend" value={formatCurrency(kpis.spend)} subtitle={`of ${formatCurrency(kpis.budget)} budget`} />
-          <KPICard label="Budget Pacing" value={`${budgetPacing}%`} subtitle="Spend vs allocated budget" />
-          <KPICard label="Daily Avg Spend" value={formatCurrency(Math.round(kpis.spend / 30))} subtitle="Over 30 days" />
-          <KPICard label="Budget Remaining" value={formatCurrency(kpis.budget - kpis.spend)} subtitle={`${(100 - parseFloat(budgetPacing)).toFixed(1)}% remaining`} />
+          <KPICard label="Total Conversions" value={formatNumber(kpis.totalConversions)} />
+          <KPICard label="Cost Per Conversion" value={`$${kpis.cpa.toFixed(2)}`} subtitle="CPA" />
+          <KPICard label="ROAS" value={`${kpis.roas.toFixed(1)}x`} subtitle="Return on ad spend" />
+          <KPICard label="Total Revenue" value={formatCurrency(kpis.totalRevenue)} subtitle="Attributed to paid" />
         </div>
       </div>
 
@@ -108,12 +106,12 @@ export function PaidAdsTab({ clientId, dateRange, insights, onInsightsChange }: 
       </div>
 
       <div>
-        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Conversions</h3>
+        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Spend & Budget</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <KPICard label="Total Conversions" value={formatNumber(kpis.totalConversions)} />
-          <KPICard label="Cost Per Conversion" value={`$${kpis.cpa.toFixed(2)}`} subtitle="CPA" />
-          <KPICard label="ROAS" value={`${kpis.roas.toFixed(1)}x`} subtitle="Return on ad spend" />
-          <KPICard label="Total Revenue" value={formatCurrency(kpis.totalRevenue)} subtitle="Attributed to paid" />
+          <KPICard label="Total Spend" value={formatCurrency(kpis.spend)} subtitle={`of ${formatCurrency(kpis.budget)} budget`} />
+          <KPICard label="Budget Pacing" value={`${budgetPacing}%`} subtitle="Spend vs allocated budget" />
+          <KPICard label="Daily Avg Spend" value={formatCurrency(Math.round(kpis.spend / 30))} subtitle="Over 30 days" />
+          <KPICard label="Budget Remaining" value={formatCurrency(kpis.budget - kpis.spend)} subtitle={`${(100 - parseFloat(budgetPacing)).toFixed(1)}% remaining`} />
         </div>
       </div>
 
@@ -221,7 +219,7 @@ export function PaidAdsTab({ clientId, dateRange, insights, onInsightsChange }: 
         <DataTable columns={campaignColumns} data={campaigns} />
       </div>
 
-      <InsightEditor tabKey="paid" insights={insights} onInsightsChange={onInsightsChange} defaultText="Budget pacing on track. Product Launch Feb campaign leads in ROAS at 4.7x. Video creatives outperform static by 62% on CTR. Recommend reallocating to Retargeting." />
+
     </div>
   );
 }

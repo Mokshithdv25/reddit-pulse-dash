@@ -6,7 +6,7 @@ import { ChartCard } from "@/components/dashboard/ChartCard";
 import { DataTable, Column } from "@/components/dashboard/DataTable";
 import { KPICard } from "@/components/dashboard/KPICard";
 import { AlertPanel } from "@/components/dashboard/AlertPanel";
-import { InsightEditor } from "@/components/dashboard/InsightEditor";
+
 import { ExecutiveSummary } from "@/components/dashboard/ExecutiveSummary";
 import { LoadingState } from "@/components/dashboard/LoadingState";
 import { EmptyState } from "@/components/dashboard/EmptyState";
@@ -23,11 +23,9 @@ const sovColors = ["hsl(var(--chart-1))", "hsl(var(--chart-2))", "hsl(var(--char
 interface TabProps {
   clientId: string;
   dateRange: DateRange;
-  insights: Record<string, string>;
-  onInsightsChange: (insights: Record<string, string>) => void;
 }
 
-export function BrandTab({ clientId, dateRange, insights, onInsightsChange }: TabProps) {
+export function BrandTab({ clientId, dateRange }: TabProps) {
   const [loading, setLoading] = useState(true);
   const [mentions, setMentions] = useState<BrandMentionPoint[]>([]);
   const [sentiment, setSentiment] = useState<SentimentPoint[]>([]);
@@ -220,7 +218,7 @@ export function BrandTab({ clientId, dateRange, insights, onInsightsChange }: Ta
         <DataTable columns={sovColumns} data={sov} />
       </div>
 
-      <InsightEditor tabKey="brand" insights={insights} onInsightsChange={onInsightsChange} defaultText="Mention spike on Feb 2-3 driven by r/technology discussion. Negative sentiment in r/marketing warrants investigation. Share of voice leading at 38.2%." />
+
     </div>
   );
 }

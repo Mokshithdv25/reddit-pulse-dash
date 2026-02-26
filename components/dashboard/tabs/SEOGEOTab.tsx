@@ -4,7 +4,7 @@ import {
 } from "recharts";
 import { KPICard } from "@/components/dashboard/KPICard";
 import { ChartCard } from "@/components/dashboard/ChartCard";
-import { InsightEditor } from "@/components/dashboard/InsightEditor";
+
 import { ExecutiveSummary } from "@/components/dashboard/ExecutiveSummary";
 import { LoadingState } from "@/components/dashboard/LoadingState";
 import { EmptyState } from "@/components/dashboard/EmptyState";
@@ -18,11 +18,9 @@ import {
 interface TabProps {
   clientId: string;
   dateRange: DateRange;
-  insights: Record<string, string>;
-  onInsightsChange: (insights: Record<string, string>) => void;
 }
 
-export function SEOGEOTab({ clientId, dateRange, insights, onInsightsChange }: TabProps) {
+export function SEOGEOTab({ clientId, dateRange }: TabProps) {
   const [loading, setLoading] = useState(true);
   const [kpis, setKpis] = useState<SEOGEOKPIs | null>(null);
   const [llmReferrals, setLLMReferrals] = useState<LLMReferralPoint[]>([]);
@@ -101,7 +99,7 @@ export function SEOGEOTab({ clientId, dateRange, insights, onInsightsChange }: T
         </p>
       </div>
 
-      <InsightEditor tabKey="seogeo" insights={insights} onInsightsChange={onInsightsChange} defaultText="LLM referral traffic growing 29.6% period-over-period. Reddit content appearing in AI search results at increasing frequency. Early-mover advantage in GEO positioning." />
+
     </div>
   );
 }

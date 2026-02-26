@@ -5,7 +5,7 @@ import {
 import { KPICard } from "@/components/dashboard/KPICard";
 import { ChartCard } from "@/components/dashboard/ChartCard";
 import { DataTable, Column } from "@/components/dashboard/DataTable";
-import { InsightEditor } from "@/components/dashboard/InsightEditor";
+
 import { ExecutiveSummary } from "@/components/dashboard/ExecutiveSummary";
 import { LoadingState } from "@/components/dashboard/LoadingState";
 import { EmptyState } from "@/components/dashboard/EmptyState";
@@ -19,11 +19,9 @@ import {
 interface TabProps {
   clientId: string;
   dateRange: DateRange;
-  insights: Record<string, string>;
-  onInsightsChange: (insights: Record<string, string>) => void;
 }
 
-export function SubredditTab({ clientId, dateRange, insights, onInsightsChange }: TabProps) {
+export function SubredditTab({ clientId, dateRange }: TabProps) {
   const [loading, setLoading] = useState(true);
   const [kpis, setKpis] = useState<SubredditKPIs | null>(null);
   const [growth, setGrowth] = useState<SubredditGrowthPoint[]>([]);
@@ -123,7 +121,7 @@ export function SubredditTab({ clientId, dateRange, insights, onInsightsChange }
         <DataTable columns={postColumns} data={topPosts} />
       </div>
 
-      <InsightEditor tabKey="subreddit" insights={insights} onInsightsChange={onInsightsChange} defaultText="Subreddit follower growth accelerating at +8.1% this period. Technical deep-dive posts drive the most traffic. AMA format shows highest comment engagement." />
+
     </div>
   );
 }

@@ -31,7 +31,7 @@ export default function HomePage() {
     const [selectedClientId, setSelectedClientId] = useState(clients[0].id);
     const [accounts, setAccounts] = useState<Account[]>([]);
     const [selectedAccounts, setSelectedAccounts] = useState<string[]>([]);
-    const [insights, setInsights] = useState<Record<string, string>>({});
+
     const [exporting, setExporting] = useState(false);
 
     useEffect(() => {
@@ -51,7 +51,7 @@ export default function HomePage() {
         }
     }, [selectedClientId, dateRange]);
 
-    const tabProps = { clientId: selectedClientId, dateRange, insights, onInsightsChange: setInsights };
+    const tabProps = { clientId: selectedClientId, dateRange };
 
     const renderTab = () => {
         switch (activeTab) {

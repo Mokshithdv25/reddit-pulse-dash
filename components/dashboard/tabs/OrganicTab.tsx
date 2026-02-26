@@ -5,7 +5,7 @@ import {
 import { ChartCard } from "@/components/dashboard/ChartCard";
 import { DataTable, Column } from "@/components/dashboard/DataTable";
 import { KPICard } from "@/components/dashboard/KPICard";
-import { InsightEditor } from "@/components/dashboard/InsightEditor";
+
 import { ExecutiveSummary } from "@/components/dashboard/ExecutiveSummary";
 import { LoadingState } from "@/components/dashboard/LoadingState";
 import { EmptyState } from "@/components/dashboard/EmptyState";
@@ -24,11 +24,9 @@ const accountKeys = ["u/OfficialBrand", "u/ProductUpdates", "u/CommunityManager"
 interface TabProps {
   clientId: string;
   dateRange: DateRange;
-  insights: Record<string, string>;
-  onInsightsChange: (insights: Record<string, string>) => void;
 }
 
-export function OrganicTab({ clientId, dateRange, insights, onInsightsChange }: TabProps) {
+export function OrganicTab({ clientId, dateRange }: TabProps) {
   const [loading, setLoading] = useState(true);
   const [karmaKPIs, setKarmaKPIs] = useState<OrganicKarmaKPI[]>([]);
   const [postScores, setPostScores] = useState<PostScoreData[]>([]);
@@ -215,7 +213,7 @@ export function OrganicTab({ clientId, dateRange, insights, onInsightsChange }: 
         <DataTable columns={trafficColumns} data={trafficAttribution} />
       </div>
 
-      <InsightEditor tabKey="organic" insights={insights} onInsightsChange={onInsightsChange} defaultText="Organic activity across external subreddits generated 2.3M impressions with 3.8% engagement. r/technology leads in traffic driven. Karma growth is secondary to business impact metrics." />
+
     </div>
   );
 }
