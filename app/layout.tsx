@@ -18,8 +18,9 @@ export default function RootLayout({
             <head>
                 <meta charSet="UTF-8" />
                 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-                <title>Reddit Pulse Dashboard</title>
-                <meta name="description" content="Reddit Performance Console - Analytics Dashboard" />
+                <title>RECHO — Reddit Growth Intelligence</title>
+                <meta name="description" content="RECHO — Reddit Growth Intelligence Dashboard" />
+                <link rel="icon" href="/favicon.png" type="image/png" />
             </head>
             <body>
                 <QueryClientProvider client={queryClient}>
