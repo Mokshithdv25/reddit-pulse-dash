@@ -55,11 +55,11 @@ export function FilterBar({ dateRange, onDateRangeChange, customDateRange, onCus
     onDateRangeChange("custom");
   };
 
-  const toggleAllAccounts = () => {
-    if (selectedAccounts.length === accounts.length) {
-      onAccountsChange([]);
-    } else {
+  const toggleAllAccounts = (checked: boolean) => {
+    if (checked) {
       onAccountsChange(accounts.map((a) => a.id));
+    } else {
+      onAccountsChange([]);
     }
   };
 
@@ -106,7 +106,11 @@ export function FilterBar({ dateRange, onDateRangeChange, customDateRange, onCus
                 {presetRanges.map(({ value, label }) => (
                   <button
                     key={value}
-                    onClick={() => handlePresetClick(value)}
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handlePresetClick(value);
+                    }}
                     className={cn(
                       "flex w-full items-center rounded-none px-3 py-1.5 text-sm transition-colors hover:bg-accent",
                       dateRange === value && !showCalendar ? "bg-accent font-medium" : ""
@@ -117,11 +121,17 @@ export function FilterBar({ dateRange, onDateRangeChange, customDateRange, onCus
                 ))}
                 <div className="border-t my-1" />
                 <button
+                  type="button"
                   className={cn(
                     "flex w-full items-center rounded-none px-3 py-1.5 text-sm transition-colors hover:bg-accent",
                     showCalendar || dateRange === "custom" ? "bg-accent font-medium" : ""
                   )}
-                  onClick={() => { setShowCalendar(true); onDateRangeChange("custom"); }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    setShowCalendar(true);
+                    onDateRangeChange("custom");
+                  }}
                 >
                   Custom Range
                 </button>
@@ -149,7 +159,7 @@ export function FilterBar({ dateRange, onDateRangeChange, customDateRange, onCus
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-48" onCloseAutoFocus={(e) => e.preventDefault()}>
-            <DropdownMenuCheckboxItem checked={allSelected} onCheckedChange={toggleAllAccounts} onSelect={(e) => e.preventDefault()}>
+            <DropdownMenuCheckboxItem checked={allSelected} onCheckedChange={(checked) => toggleAllAccounts(checked)} onSelect={(e) => e.preventDefault()}>
               Select All
             </DropdownMenuCheckboxItem>
             <DropdownMenuSeparator />
